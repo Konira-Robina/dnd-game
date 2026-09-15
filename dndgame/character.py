@@ -1,24 +1,47 @@
 from dndgame.dice import roll
+from dndgame.entity import Entity
 
 
-class Character:
-    def __init__(self, name, race, base_hp):
-        self.name = name
-        self.race = race
-        self.stats = {}
-        self.base_hp = base_hp
-        self.hp = 0
-        self.max_hp = 0
-        self.level = 1
-        self.armor_class = 10
+RACE_BONUSES: dict[str, dict[str, int]] = {
+    "Human": {
+        "STR": 1,
+        "DEX": 1,
+        "CON": 1,
+        "INT": 1,
+        "WIS": 1,
+        "CHA": 1,
+    },
+    "Elf": {
+        "DEX": 2,
+    },
+    "Dwarf": {
+        "CON": 2,
+    },
+    "Halfling": {
+        "DEX": 2,
+    },
+}
 
-    def get_modifier(self, stat):
-        """Calculate ability modifier."""
-        return (self.stats[stat] - 10) // 2
 
-    def roll_stats(self):
+class Character(Entity):
+    """Represent a player character in the game."""
+
+    def __init__(self, name: str, race: str, base_hp: int) -> None:
+        """Initialize a player character.
+
+        Args:
+            name: The character's name.
+            race: The character's race.
+            base_hp: The character's starting hit points.
+        """
+        super().__init__(name, base_hp)
+        self.race: str = race
+
+    def roll_stats(self) -> None:
+        """Roll and assign the character's ability scores."""
         print("Rolling stats...\n")
         stats = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
+
         for stat in stats:
             print(f"Rolling {stat}...")
             self.stats[stat] = roll(6, 3)
@@ -26,11 +49,9 @@ class Character:
         self.max_hp = self.base_hp + self.get_modifier("CON")
         self.hp = self.max_hp
 
-    def apply_racial_bonuses(self):
-        if self.race == "Dwarf":
-            self.stats["CON"] += 2
-        elif self.race == "Elf":
-            self.stats["DEX"] += 2
-        elif self.race == "Human":
-            for stat in self.stats:
-                self.stats[stat] += 1
+    def apply_racial_bonuses(self) -> None:
+        """Apply the ability bonuses associated with the character's race."""
+        bonuses = RACE_BONUSES.get(self.race, {})
+
+        for stat, bonus in bonuses.items():
+            self.stats[stat] += bonus

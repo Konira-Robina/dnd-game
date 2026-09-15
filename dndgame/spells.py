@@ -11,15 +11,15 @@ class Spell:
 
 
 class SpellBook:
+    """Manage a collection of spells."""
+
     def __init__(self) -> None:
         self.spells: list[Spell] = []
 
     def add_spell(self, spell: Spell) -> None:
+        """Add a spell to the spellbook."""
         self.spells.append(spell)
 
     def get_available_spells(self, spell_level: int) -> list[Spell]:
-        available = []
-        for spell in self.spells:
-            if spell.level <= spell_level:
-                available.append(spell)
-        return available
+        """Return spells available at the given spell level."""
+        return [spell for spell in self.spells if spell.level <= spell_level]
